@@ -1,4 +1,4 @@
-import React, { View, TextInput, FlatList, Text, SafeAreaView, Image, Alert } from "react-native";
+import React, { View, TextInput, FlatList, Text, SafeAreaView, Image, Alert, Pressable } from "react-native";
 import { styles } from "./style";
 import { color } from "../../shared/global/styles";
 import { Button } from "../button";
@@ -8,6 +8,7 @@ import { ITasks } from "../../shared/global/interfaces";
 import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { EmptyComponent } from "../emptyComponent";
 import { CounterTask } from "../counter";
+import { api } from "../../service/api";
 
 export interface IPropsTasks {
     title?: string;
@@ -30,16 +31,36 @@ export function Forms(props: any) {
         { title: "assistir video aula", description: "assistir e fazer resumo da video aula do dia 12/05", complete: true },
     ]);
 
-    const [newTask, setNewTask] = useState<IPropsTasks>({});
+
+    useEffect(()=> {
+       getTasks();
+    },[]);
+
+    async function getTasks(){
+        await api.get("").then(res => {
+            res.data.tarefas.map((item: any)=> {
+                console.log(item.titulo);
+                setTasks(prevState => [...prevState, {
+                    title: item.titulo,
+                    description: item.descricao,
+                    complete: item.complete
+                }]);
+            });
+        });
+    }
 
     function handleAddList() {
         setTitleComplete(titleTask);
         setDescriptionComplete(descriptionTask);
     }
 
-    function handleAddTasks() {
+    async function handleAddTasks() {
         setDescriptionComplete(descriptionTask);
         setTasks(precState => [...precState,{ title: titleTask, description: descriptionTask, complete: false }]);
+        await api.post("", {
+            titulo: titleTask,
+            descricao: descriptionTask
+        });
         cleanCache();
     }
 
@@ -81,10 +102,6 @@ export function Forms(props: any) {
             }
         ])
 
-    }
-
-    function handleNewTaskAdd(titleTask?: string, descriptionTask?: string) {
-        setNewTask({ title: titleTask, description: descriptionTask, complete: false });
     }
 
     function cleanCache() {
