@@ -8,7 +8,7 @@ import { ITasks } from "../../shared/global/interfaces";
 import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { EmptyComponent } from "../emptyComponent";
 import { CounterTask } from "../counter";
-import { api } from "../../service/api";
+import { METHOD, callService } from "../../service/api";
 
 export interface IPropsTasks {
     id?: string;
@@ -33,16 +33,28 @@ export function Forms(props: any) {
     }, [])
 
     async function getTasks() {
-        await api.get("").then(res => {
-            setTasks([]);
-            res.data.tarefas.map((item: any) => {
-                setTasks(prevState =>[...prevState.concat({
-                    id: item.id,
-                    title: item.titulo,
-                    description: item.descricao,
-                    complete: item.complete
-                })]);
-            });
+        setTasks([]);
+        // como era antes
+        // await api.get("").then(res => {
+        //     setTasks([]);
+        //     res.data.tarefas.map((item: any) => {
+        //         setTasks(prevState =>[...prevState.concat({
+        //             id: item.id,
+        //             title: item.titulo,
+        //             description: item.descricao,
+        //             complete: item.complete
+        //         })]);
+        //     });
+        // });
+        
+        const data = await callService({ method: METHOD.GET}).then((res)=> res.tarefas);
+        data.map((item: ITasks) => {
+            setTasks(prevState => [...prevState, {
+                id: item.id,
+                title: item.title,
+                description: item.description,
+                complete: item.complete
+            }]);
         });
     }
 
@@ -54,11 +66,14 @@ export function Forms(props: any) {
     async function handleAddTasks() {
         setDescriptionComplete(descriptionTask);
         //setTasks(precState => [...precState,{ title: titleTask, description: descriptionTask, complete: false }]);
-        await api.post("", {
-            titulo: titleTask,
-            descricao: descriptionTask
-        });
-        getTasks();
+        // await api.post("", {
+        //     titulo: titleTask,
+        //     descricao: descriptionTask
+        // });
+        callService({ method: METHOD.POST, body: {
+            title: titleTask,
+            description: descriptionTask
+        }}).finally(()=> getTasks());
         cleanCache();
     }
 
@@ -163,10 +178,10 @@ export function Forms(props: any) {
                     </View>
                     <FlatList
                         data={tasks}
-                        keyExtractor={(item) => item.title}
+                        keyExtractor={(item) => item.id}
                         renderItem={(item) => (
                             <RenderTask
-                                key={item.item.title}
+                                key={item.item.id}
                                 title={item.item.title}
                                 description={item.item.description}
                                 complete={item.item.complete}
