@@ -11,6 +11,7 @@ import { CounterTask } from "../counter";
 import { api } from "../../service/api";
 
 export interface IPropsTasks {
+    id?: string;
     title?: string;
     description?: string;
     complete?: boolean;
@@ -25,26 +26,22 @@ export function Forms(props: any) {
     const [titleComplete, setTitleComplete] = useState<string>('');
     const [descriptionComplete, setDescriptionComplete] = useState<string>('');
 
-    const [tasks, setTasks] = useState<ITasks[]>([
-        { title: "licao de casa", description: "fazer atividade de  matematica", complete: false },
-        { title: "limpar casa", description: "lavar banheiro", complete: false },
-        { title: "assistir video aula", description: "assistir e fazer resumo da video aula do dia 12/05", complete: true },
-    ]);
+    const [tasks, setTasks] = useState<ITasks[]>([]);
 
+    useEffect(() => {
+        getTasks()
+    }, [])
 
-    useEffect(()=> {
-       getTasks();
-    },[]);
-
-    async function getTasks(){
+    async function getTasks() {
         await api.get("").then(res => {
-            res.data.tarefas.map((item: any)=> {
-                console.log(item.titulo);
-                setTasks(prevState => [...prevState, {
+            setTasks([]);
+            res.data.tarefas.map((item: any) => {
+                setTasks(prevState =>[...prevState.concat({
+                    id: item.id,
                     title: item.titulo,
                     description: item.descricao,
                     complete: item.complete
-                }]);
+                })]);
             });
         });
     }
@@ -56,18 +53,19 @@ export function Forms(props: any) {
 
     async function handleAddTasks() {
         setDescriptionComplete(descriptionTask);
-        setTasks(precState => [...precState,{ title: titleTask, description: descriptionTask, complete: false }]);
+        //setTasks(precState => [...precState,{ title: titleTask, description: descriptionTask, complete: false }]);
         await api.post("", {
             titulo: titleTask,
             descricao: descriptionTask
         });
+        getTasks();
         cleanCache();
     }
 
     function changeTitleTask() {
         setTitleComplete(titleTask);
     }
-    
+
     function changeStateComplete(title: string) {
         let taskChange = tasks.find((item) => item.title === title);
         let taskChangeIndex = tasks.findIndex((item) => item.title === title);
