@@ -29,7 +29,7 @@ export async function callService({ method,  url, body }: CallServiceProps){
     const { data } = await api({
         url: url,
         method: method,
-        data: body 
+        data: body,
     });
     return data;
 }

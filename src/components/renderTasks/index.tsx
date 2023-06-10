@@ -4,17 +4,18 @@ import trash from "../../../assets/trash.png"
 import checkComplete from "../../../assets/check2.png";
 import checkIncomplete from "../../../assets/cicleIncomplete.png"
 interface IPropsTasks {
+    id: string;
     title: string;
     description?: string;
     complete?: boolean;
     changeComplete?: (title: string) => void;
-    removeTask?: (titleRemove: string) => void;
+    removeTask?: (titleRemove: string, id: string) => void;
 }
 
-export function RenderTask({ title, description, complete, removeTask, changeComplete }: IPropsTasks) {
+export function RenderTask({ title, description, complete, id, removeTask, changeComplete }: IPropsTasks) {
 
     function remove() {
-        (removeTask && title) ? removeTask(title) : null;
+        (removeTask && title && id) ? removeTask(title, id) : null;
     }
 
     function changeCompleteList() {

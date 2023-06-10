@@ -5,7 +5,6 @@ import { Button } from "../button";
 import { useEffect, useState } from "react";
 import { RenderTask } from "../renderTasks";
 import { ITasks } from "../../shared/global/interfaces";
-import { responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { EmptyComponent } from "../emptyComponent";
 import { CounterTask } from "../counter";
 import { METHOD, callService } from "../../service/api";
@@ -47,7 +46,7 @@ export function Forms(props: any) {
         //     });
         // });
         
-        const data = await callService({ method: METHOD.GET}).then((res)=> res.tarefas);
+        const data = await callService({ method: METHOD.GET }).then((res)=> res.tarefas);
         data.map((item: ITasks) => {
             setTasks(prevState => [...prevState, {
                 id: item.id,
@@ -65,11 +64,6 @@ export function Forms(props: any) {
 
     async function handleAddTasks() {
         setDescriptionComplete(descriptionTask);
-        //setTasks(precState => [...precState,{ title: titleTask, description: descriptionTask, complete: false }]);
-        // await api.post("", {
-        //     titulo: titleTask,
-        //     descricao: descriptionTask
-        // });
         callService({ method: METHOD.POST, body: {
             title: titleTask,
             description: descriptionTask
@@ -102,12 +96,19 @@ export function Forms(props: any) {
         }
     }
 
-    function removeTask(titleRemove: string) {
+    async function remove(id: string){
+       await callService({ method: METHOD.DELETE, url: id}).then(res =>{
+         console.log(res.message); 
+        });
+    }
+
+  async function removeTask(titleRemove: string, id: string) {
         Alert.alert("Remover Tarefa", `Deseja remover "${titleRemove}" da lista de tarefas?`, [
             {
                 text: "Sim",
                 style: "destructive",
-                onPress: () => setTasks(prevState => prevState.filter((item) => item.title != titleRemove))
+            onPress: () => remove(id)
+                // setTasks(prevState => prevState.filter((item) => item.title != titleRemove))
             },
             {
                 text: "Não",
@@ -182,6 +183,7 @@ export function Forms(props: any) {
                         renderItem={(item) => (
                             <RenderTask
                                 key={item.item.id}
+                                id={item.item.id}
                                 title={item.item.title}
                                 description={item.item.description}
                                 complete={item.item.complete}

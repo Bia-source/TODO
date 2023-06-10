@@ -3,8 +3,8 @@ import { responsiveScreenHeight, responsiveScreenWidth } from "react-native-resp
 
 interface IProps{
     backgroundColor?: string;
-
 }
+
 export const styles = (props: any) => StyleSheet.create({
     container: {
         flex: 1,
