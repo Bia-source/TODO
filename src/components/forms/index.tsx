@@ -75,31 +75,25 @@ export function Forms(props: any) {
         setTitleComplete(titleTask);
     }
 
-    function changeStateComplete(title: string) {
+  async function changeStateComplete(title: string) {
         let taskChange = tasks.find((item) => item.title === title);
-        let taskChangeIndex = tasks.findIndex((item) => item.title === title);
-
-        if (tasks[taskChangeIndex].complete === false) {
-            Object.assign(tasks[taskChangeIndex], {
-                title: taskChange?.title,
-                description: taskChange?.description,
-                complete: true
-            });
-            setTasks(prevState => [...prevState]);
-        } else {
-            Object.assign(tasks[taskChangeIndex], {
-                title: taskChange?.title,
-                description: taskChange?.description,
-                complete: false
-            });
-            setTasks(prevState => [...prevState]);
+        console.log(taskChange?.complete);
+        console.log(taskChange?.id);
+        if(!taskChange){
+            return null
         }
+        await callService({ method: METHOD.PUT, url: `status/${taskChange.id}`, body: {
+            complete: taskChange.complete === true ? false : true  
+        }}).then((res)=> {
+            
+        });
+        getTasks(); 
     }
 
     async function remove(id: string){
        await callService({ method: METHOD.DELETE, url: id}).then(res =>{
-         console.log(res.message); 
         });
+        getTasks();
     }
 
   async function removeTask(titleRemove: string, id: string) {
