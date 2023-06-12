@@ -8,7 +8,6 @@ import { ITasks } from "../../shared/global/interfaces";
 import { EmptyComponent } from "../emptyComponent";
 import { CounterTask } from "../counter";
 import { METHOD, callService } from "../../service/api";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 export interface IPropsTasks {
     id?: string;
@@ -30,8 +29,10 @@ export function Forms(props: any) {
 
     useEffect(() => {
         getTasks()
+        
     }, [])
 
+    
     async function getTasks() {
         setTasks([]);
         // como era antes
@@ -46,8 +47,8 @@ export function Forms(props: any) {
         //         })]);
         //     });
         // });
-        
-        const data = await callService({ method: METHOD.GET }).then((res)=> res.tarefas);
+
+        const data = await callService({ method: METHOD.GET }).then((res) => res.tarefas);
         data.map((item: ITasks) => {
             setTasks(prevState => [...prevState, {
                 id: item.id,
@@ -65,70 +66,59 @@ export function Forms(props: any) {
 
     async function handleAddTasks() {
         setDescriptionComplete(descriptionTask);
-        
-        callService({ method: METHOD.POST, body: {
-            title: titleTask,
-            description: descriptionTask
-        }}).then((res)=> {
+
+        callService({
+            method: METHOD.POST, body: {
+                title: titleTask,
+                description: descriptionTask
+            }
+        }).then((res) => {
             setTasks(prevState => [...prevState, {
                 id: res.tarefa.id,
                 title: res.tarefa.title,
                 description: res.tarefa.description,
                 complete: false
-           }]);
-           showToast()
-        //    Toast.show({
-        //     type: "success",
-        //     text1: "Cadastrado com sucesso!"
-        //    })
+            }]);
         });
         cleanCache();
     }
 
-    const showToast = () => {
-        Toast.show({
-          type: 'success',
-          text1: 'Hello',
-          text2: 'This is some something 👋'
-        });
-      }
-
+    
     function changeTitleTask() {
         setTitleComplete(titleTask);
     }
 
-  async function changeStateComplete(title: string) {
+    async function changeStateComplete(title: string) {
         let taskChange = tasks.find((item) => item.title === title);
         let taskIndex = tasks.findIndex((item) => item.title === title);
 
-        if(!taskChange){
+        if (!taskChange) {
             return null
         }
-        await callService({ method: METHOD.PUT, url: `status/${taskChange.id}`, body: {
-            complete: taskChange.complete === true ? false : true  
-        }}).then((res)=> {
-            console.log("res: ",res);
-            console.log("tasks",tasks[taskIndex]);
+        await callService({
+            method: METHOD.PUT, url: `status/${taskChange.id}`, body: {
+                complete: taskChange.complete === true ? false : true
+            }
+        }).then((res) => {
             Object.assign(tasks[taskIndex], {
                 complete: res.tarefa_atualizada.complete
             });
-            //setTasks(prevState => prevState.find(task => task.id === res.tarefa_atualizada.id))
-        });
-        getTasks(); 
-    }
-
-    async function remove(id: string){
-       await callService({ method: METHOD.DELETE, url: id}).then(res =>{
-        setTasks(prevState => prevState.filter((item) => item.id != res.tarefaDeletada.id));
+            setTasks(prevState => [...prevState]);
         });
     }
 
-  async function removeTask(titleRemove: string, id: string) {
+    async function remove(id: string) {
+        await callService({ method: METHOD.DELETE, url: id }).then(res => {
+            setTasks(prevState => prevState.filter((item) => item.id != res.tarefaDeletada.id));
+        });
+    }
+
+    async function removeTask(titleRemove: string, id: string) {
         Alert.alert("Remover Tarefa", `Deseja remover "${titleRemove}" da lista de tarefas?`, [
             {
                 text: "Sim",
                 style: "destructive",
-            onPress: () => {remove(id)}
+                onPress: () => { remove(id) }
             },
             {
                 text: "Não",
