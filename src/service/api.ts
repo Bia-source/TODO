@@ -21,11 +21,20 @@ export enum METHOD {
 }
 
 const api = axios.create({
-        baseURL: `http://localhost:3001/tarefas/`,
+        baseURL: "http://localhost:3001/tarefas/",
         headers: { 'Content-Type': 'application/json'},
+        // proxy: {
+        //     protocol: 'https',
+        //     host: '192.168.0.16',
+        //     port: 3001,
+        //     auth: {
+        //       username: `${process.env.AUTH_USERNAME_API}`,
+        //       password: `${process.env.AUTH_PASSWORD_API}`
+        //     }
+        //  },
 });
 
-export async function callService({ method,  url, body }: CallServiceProps){
+export async function callService({ method, url, body }: CallServiceProps){
     const { data } = await api({
         url: url,
         method: method,
@@ -33,3 +42,4 @@ export async function callService({ method,  url, body }: CallServiceProps){
     });
     return data;
 }
+
