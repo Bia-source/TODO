@@ -22,7 +22,7 @@ export enum METHOD {
 
 const api = axios.create({
         baseURL: "http://localhost:3001/tarefas/",
-        headers: { 'Content-Type': 'application/json'},
+        headers: { 'content-type': 'application/json'},
         // proxy: {
         //     protocol: 'https',
         //     host: '192.168.0.16',
